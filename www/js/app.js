@@ -32,10 +32,63 @@ $('#confirmar').on('click', function(){
 $('.collection').on('click', '.badge', function(){
 	$(this).remove();
 	return false;
-})
+});
 
 // Apagando todos os itens do pedido
 $('.acao-limpar').on('click', function(){
 	$('#numero-mesa').val('');
 	$('.badge').remove();
-})
+});
+
+// Lendo código de barras
+$('.scan-qrcode').on('click', function(){
+	cordova.plugins.barcodeScanner.scan(
+		function(resultado){
+			if(resultado.text){
+				Materialize.toast('Mesa ' + resultado.text, 2000);
+				$('#numero-mesa').val(resultado.text);
+			}
+		},
+		function(error){
+			Materialize.toast('Erro: ' + error, 3000, 'red-text');
+		}
+	);	
+});
+
+// Acessando a API via Ajax
+
+// Pegando o click do botão
+$('.acao-finalizar').on('click', function(){
+	// Conectando na API
+	$.ajax({
+		url: 'http://cozinhapp.sergiolopes.org/novo-pedido',
+		data: {
+			mesa: $('#numero-mesa').val(),
+			pedido: $('#resumo').text()
+		},
+		// Callback de sucesso e erro
+		error: function(erro){
+			Materialize.toast(erro.responseText,3000, 'red-text');
+		},
+		success: function(dados){
+			Materialize.toast(dados, 2000);
+
+			$('#numero-mesa').val('');
+			$('.badge').remove();
+
+		}
+	});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
